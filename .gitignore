@@ -1,0 +1,37 @@
+# a.忽略文件夹
+target/
+.settings/
+
+
+# b.忽略文件
+# 自己扩展的
+*.classpath
+*.project
+# 匹配以.开头的文件
+.*
+# 但是不能忽略.gitignore
+!.gitignore
+
+
+
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+

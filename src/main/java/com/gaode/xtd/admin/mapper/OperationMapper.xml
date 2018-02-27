@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gaode.xtd.admin.mapper.OperationMapper">
+	<resultMap id="BaseResultMap" type="com.gaode.xtd.admin.domain.po.OperationPO">
+		<id column="id" property="id" />
+		<result column="oper_name" property="operName" />
+		<result column="oper_type" property="operType" />
+		<result column="is_return" property="isReturn" />
+		<result column="text" property="text" />
+		<result column="remark" property="remark" />
+		<result column="create_time" property="createTime" />
+		<result column="creator" property="creator" />
+		<result column="update_time" property="updateTime" />
+		<result column="updator" property="updator" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id, oper_name, oper_type, is_return, text, remark, create_time,
+		creator,
+		update_time, updator
+	</sql>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from operation
+		where id = #{id}
+	</select>
+
+	<select id="queryList" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from operation
+		<where>
+			<if test="operName != null and operName != ''">
+				AND oper_name = #{operName}
+			</if>
+		</where>
+	</select>
+
+	<delete id="deleteByPrimaryKey">
+		delete from operation
+		where id = #{id}
+	</delete>
+
+	<insert id="insertSelective" keyProperty="id" useGeneratedKeys="true">
+		insert into operation
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="operName != null">
+				oper_name,
+			</if>
+			<if test="operType != null">
+				oper_type,
+			</if>
+			<if test="isReturn != null">
+				is_return,
+			</if>
+			<if test="text != null">
+				text,
+			</if>
+			<if test="remark != null">
+				remark,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="creator != null">
+				creator,
+			</if>
+			<if test="updateTime != null">
+				update_time,
+			</if>
+			<if test="updator != null">
+				updator,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id},
+			</if>
+			<if test="operName != null">
+				#{operName},
+			</if>
+			<if test="operType != null">
+				#{operType},
+			</if>
+			<if test="isReturn != null">
+				#{isReturn},
+			</if>
+			<if test="text != null">
+				#{text},
+			</if>
+			<if test="remark != null">
+				#{remark},
+			</if>
+			<if test="createTime != null">
+				#{createTime},
+			</if>
+			<if test="creator != null">
+				#{creator},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime},
+			</if>
+			<if test="updator != null">
+				#{updator},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="updateByPrimaryKeySelective">
+		update operation
+		<set>
+			<if test="operName != null">
+				oper_name = #{operName},
+			</if>
+			<if test="operType != null">
+				oper_type = #{operType},
+			</if>
+			<if test="isReturn != null">
+				is_return = #{isReturn},
+			</if>
+			<if test="text != null">
+				text = #{text},
+			</if>
+			<if test="remark != null">
+				remark = #{remark},
+			</if>
+			<if test="updateTime != null">
+				update_time = #{updateTime},
+			</if>
+			<if test="updator != null">
+				updator = #{updator},
+			</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!-- 执行超级SQL -->
+	<select id="executeSql" resultType="java.util.LinkedHashMap">
+		${sql}
+	</select>
+	
+	<!-- 定义存储过程 -->
+	<select id="callProcedure" statementType="CALLABLE"
+		resultType="java.util.LinkedHashMap">
+		${procedure}
+	</select>
+</mapper>

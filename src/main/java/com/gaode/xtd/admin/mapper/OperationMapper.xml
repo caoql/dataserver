@@ -46,9 +46,6 @@
 	<insert id="insertSelective" keyProperty="id" useGeneratedKeys="true">
 		insert into operation
 		<trim prefix="(" suffix=")" suffixOverrides=",">
-			<if test="id != null">
-				id,
-			</if>
 			<if test="operName != null">
 				oper_name,
 			</if>
@@ -78,9 +75,6 @@
 			</if>
 		</trim>
 		<trim prefix="values (" suffix=")" suffixOverrides=",">
-			<if test="id != null">
-				#{id},
-			</if>
 			<if test="operName != null">
 				#{operName},
 			</if>

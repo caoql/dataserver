@@ -1,10 +1,12 @@
 package com.gaode.xtd.admin.service.impl;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +14,12 @@ import org.springframework.stereotype.Service;
 
 import com.gaode.xtd.admin.domain.po.OperationPO;
 import com.gaode.xtd.admin.domain.query.OperationParam;
+import com.gaode.xtd.admin.domain.vo.OperationVO;
 import com.gaode.xtd.admin.mapper.OperationMapper;
 import com.gaode.xtd.admin.service.OperationService;
 import com.gaode.xtd.common.SystemConstant;
+import com.gaode.xtd.common.enums.ErrorCodeEnum;
+import com.gaode.xtd.common.exception.ServiceException;
 import com.gaode.xtd.common.info.ResponseInfo;
 
 @Service
@@ -62,6 +67,97 @@ public class OperationServiceImpl implements OperationService {
 					
 				}
 			}
+		}
+		return info;
+	}
+
+	/**
+	 * 新增
+	 */
+	@Override
+	public ResponseInfo insertSelective(OperationVO vo) {
+		if (vo == null) {
+			throw new ServiceException("新增的内容不能为空");
+		}
+		if (StringUtils.isBlank(vo.getOperName())) {
+			throw new ServiceException("新增内容的<操作名称>不能为空");
+		}
+		// 检查operName是否重复
+		OperationParam param = new OperationParam();
+		param.setOperName(vo.getOperName());
+		List<OperationPO> list = operationMapper.queryList(param);
+		if (list != null && list.size() > 0) {
+			throw new ServiceException("文本名字(oper_name):" + vo.getOperName() + "已经存在，不能重复");
+		}
+		ResponseInfo info = new ResponseInfo();
+		OperationPO record = vo.toPO();
+		// 跟踪信息
+		record.setCreateTime(new Date());
+		
+		int result = operationMapper.insertSelective(record);
+		if (result != 1) {
+			info.code = ErrorCodeEnum.DB_INSERT_ERROR.getCode();
+			info.msg = ErrorCodeEnum.DB_INSERT_ERROR.getMsg();
+		}
+		return info;
+	}
+
+	/**
+	 * 修改
+	 */
+	@Override
+	public ResponseInfo updateSelective(OperationVO vo) {
+		if (vo == null) {
+			throw new ServiceException("修改的内容不能为空");
+		}
+		if (vo.getId() == null) {
+			throw new ServiceException("修改内容的ID不能为空");
+		}
+		if (StringUtils.isBlank(vo.getOperName())) {
+			throw new ServiceException("修改内容的<操作名称>不能为空");
+		}
+		// 还要校验operName是否重复
+		OperationParam param = new OperationParam();
+		param.setOperName(vo.getOperName());
+		List<OperationPO> list = operationMapper.queryList(param);
+		if (list != null && list.size() > 0) {
+			for (OperationPO po : list) {
+				// 查询出所有这个operName名字的，只要他们的ID有一个和编辑数据的ID不同，就认为已经存在这个operName
+				if (!Objects.equals(po.getId(), vo.getId())) {
+					throw new ServiceException("文本名字(oper_name):" + vo.getOperName() + "已经存在，不能重复");
+				}
+			}
+		}
+		ResponseInfo info = new ResponseInfo();
+		OperationPO record = vo.toPO();
+		// 跟踪信息
+		record.setUpdateTime(new Date());
+		
+		int result = operationMapper.updateByPrimaryKeySelective(record);
+		if (result != 1) {
+			info.code = ErrorCodeEnum.DB_UPDATE_ERROR.getCode();
+			info.msg = ErrorCodeEnum.DB_UPDATE_ERROR.getMsg();
+		}
+		return info;
+	}
+
+	/**
+	 * 删除
+	 */
+	@Override
+	public ResponseInfo deleteByPrimaryKey(Integer id) {
+		if (id == null) {
+			throw new ServiceException("删除ID不能为空");
+		}
+		OperationPO po = operationMapper.selectByPrimaryKey(id);
+		if (po == null) {
+			throw new ServiceException("ID为:" + id + "的数据记录不存在,不能删除");
+		}
+		ResponseInfo info = new ResponseInfo();
+		int result = operationMapper.deleteByPrimaryKey(id);
+		if (result != 1) {
+			info.code = ErrorCodeEnum.DB_DELETE_ERROR.getCode();
+			info.msg = ErrorCodeEnum.DB_DELETE_ERROR.getMsg();
 		}
 		return info;
 	}

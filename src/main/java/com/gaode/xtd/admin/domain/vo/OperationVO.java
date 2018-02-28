@@ -1,21 +1,20 @@
-package com.gaode.xtd.admin.domain.po;
+package com.gaode.xtd.admin.domain.vo;
 
 import java.io.Serializable;
-import java.util.Date;
 
+import com.gaode.xtd.admin.domain.po.OperationPO;
 import com.gaode.xtd.common.reflect.ObjReflect;
 
 /**
- * operation表对应的PO
+ * operation 对应的VO
  * @author andyc 
- * 2018-2-26
+ * 2018-2-28
  */
-public class OperationPO implements Serializable {
+public class OperationVO implements Serializable {
 	/**
 	 * 序列号
 	 */
-	private static final long serialVersionUID = 7054111805881554185L;
-
+	private static final long serialVersionUID = -8321410386041533202L;
 	private Integer id;
 	// 文本名字
 	private String operName;
@@ -25,17 +24,23 @@ public class OperationPO implements Serializable {
 	private String isReturn;
 	// 储存脚本内容
 	private String text;
-
 	private String remark;
 
-	private Date createTime;
-
-	private String creator;
-
-	private Date updateTime;
-
-	private String updator;
-
+	/**
+	 * 转换成PO
+	 * @return
+	 */
+	public OperationPO toPO() {
+		OperationPO po = new OperationPO();
+		po.setId(id);
+		po.setOperName(operName);
+		po.setOperType(operType);
+		po.setIsReturn(isReturn);
+		po.setText(text);
+		po.setRemark(remark);
+		return po;
+	}
+	
 	@Override
 	public String toString() {
 		return ObjReflect.toString(this);
@@ -88,37 +93,5 @@ public class OperationPO implements Serializable {
 
 	public void setRemark(String remark) {
 		this.remark = remark == null ? null : remark.trim();
-	}
-
-	public Date getCreateTime() {
-		return createTime;
-	}
-
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
-
-	public String getCreator() {
-		return creator;
-	}
-
-	public void setCreator(String creator) {
-		this.creator = creator == null ? null : creator.trim();
-	}
-
-	public Date getUpdateTime() {
-		return updateTime;
-	}
-
-	public void setUpdateTime(Date updateTime) {
-		this.updateTime = updateTime;
-	}
-
-	public String getUpdator() {
-		return updator;
-	}
-
-	public void setUpdator(String updator) {
-		this.updator = updator == null ? null : updator.trim();
 	}
 }

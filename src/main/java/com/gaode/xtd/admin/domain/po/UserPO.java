@@ -7,7 +7,7 @@ import com.gaode.xtd.common.reflect.ObjReflect;
 /**
  * User 表对相应的PO
  * @author andyc
- * 2018-2-16
+ * 2018-2-26
  */
 public class UserPO implements Serializable {
 	

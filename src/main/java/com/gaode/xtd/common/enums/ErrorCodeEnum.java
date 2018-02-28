@@ -7,7 +7,22 @@ package com.gaode.xtd.common.enums;
  */
 public enum ErrorCodeEnum {
 	CALL_SUCCESS(0, "操作成功"), 
-    CALL_ERROR(9999, "系统异常，请稍后重试...");
+    CALL_ERROR(9999, "系统异常，请稍后重试..."),
+    
+    //通用异常定义
+    COMMON_ERROR(9000, "通用的未知错误"),
+    
+    // Dao层的通用错误定义
+    DAO_ERROR(8000, "Dao层的未知错误"),
+	
+    // Service层的通用错误定义
+    SERVICE_ERROR(7000, "Service层的未知错误"),
+    
+    // 数据库相关错误定义以8开头
+	DB_INSERT_ERROR(8010, "数据库插入数据失败"),
+	DB_UPDATE_ERROR(8020, "数据库更新数据失败"),
+	DB_DELETE_ERROR(8030, "数据库删除数据失败");
+	
     /**
      * 错误码
      */

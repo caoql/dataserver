@@ -7,43 +7,27 @@ import com.gaode.xtd.common.enums.ErrorCodeEnum;
  * @author andyc
  * @since 2018-2-26
  */
-public class DaoException extends RuntimeException {
+public class DaoException extends CommonException {
 	/**
 	 * 序列号
 	 */
 	private static final long serialVersionUID = 8376281035177970222L;
 	
-	public static final int COMMON_ERROR_CODE = 7000;
-	public static final String COMMON_ERROR_MSG = "Dao层的未知错误";
-    
-    private Integer code;
-    private String msg;
+	public DaoException() {
+		this.code = ErrorCodeEnum.DAO_ERROR.getCode();
+		this.msg = ErrorCodeEnum.DAO_ERROR.getMsg();
+	}
     
     public DaoException(ErrorCodeEnum errorCodeEnum) {
-        this.code = errorCodeEnum.getCode();
-        this.msg = errorCodeEnum.getMsg();
+       super(errorCodeEnum);
     }
     
-    public DaoException(Integer code, String msg) {
-        this.code = code;
-        this.msg = msg;
+    public DaoException(int code, String msg) {
+        super(code, msg);
     }
     
     public DaoException(String msg) {
-        this.code = CommonException.COMMON_ERROR_CODE;
+        this.code = ErrorCodeEnum.DAO_ERROR.getCode();
         this.msg = msg;
-    }
-    
-    public DaoException() {
-        this.code = CommonException.COMMON_ERROR_CODE;
-        this.msg = CommonException.COMMON_ERROR_MSG;
-    }
-
-    public Integer getCode() {
-        return code;
-    }
-
-    public String getMsg() {
-        return msg;
     }
 }

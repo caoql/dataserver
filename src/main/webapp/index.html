@@ -1,10 +1,100 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<title>数据</title>
 </head>
 <body>
-	hello 
+	<div class="panel panel-success">
+		<div class="panel-heading"
+			style="padding-top: 5px; padding-bottom: 5px;">
+			<h4>数据服务接口配置</h4>
+		</div>
+		<div class="panel-body" style="padding-top: 5px; padding-bottom: 5px;">
+			<form id="formTemple">
+				<div class="form-group">
+					<label for="operName">操作名称</label> <input type="text" 
+					class="form-control" id="operName" name="operName" placeholder="操作名称">
+				</div>
+				<div class="form-group">
+					<label for="operType">语句类型</label> <select class="form-control"
+						name="operType" id="operType">
+						<option value="A">sql语句</option>
+						<option value="B">存储过程</option>
+					</select>
+				</div>
+
+				<div class="form-group">
+					<label for="text">模板</label>
+					<textarea class="form-control" rows="3" id="text" name="text"></textarea>
+				</div>
+				<button class="btn btn-info" type="button" id="btnSave">保存</button>
+				<button class="btn btn-primary" id="analyzeParam">解析参数</button>
+				<br />
+			</form>
+			<table class="table">
+				<tr>
+					<th>参数名称</th>
+					<th>参数类型</th>
+					<th>输入/输出</th>
+					<th>操作</th>
+				</tr>
+				<tr>
+					<td>parameter1</td>
+					<td>参数类型</td>
+					<td>输入</td>
+					<td><a href="javascript:void()">编辑</a></td>
+				</tr>
+				<tr>
+					<td>parameter2</td>
+					<td>参数类型</td>
+					<td>输出</td>
+					<td><a href="javascritp:volid()">编辑</a></td>
+				</tr>
+			</table>
+		</div>
+	</div>
 </body>
+<script src="js/jquery-3.2.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/vue.min.js"></script>
+<script type="text/javascript">
+	$('#btnSave').click(function() {
+		var formData = serializeToJson('#formTemple', true);
+		// 校验-待完善
+		if (!formData) {
+			return false;
+		}
+		// 向后台发送post请求
+		$.ajax({
+			type: 'POST',
+			url: '/dataserver/admin/operation/add',
+			data: JSON.stringify(formData),
+			contentType: 'application/json',
+			success: function(data) {
+				console.log(data);
+				if (data && data.code == 0) {
+					alert("操作成功");
+				} else {
+					alert(data.msg);
+				}
+			}
+		});
+	});
+	
+	// form表单数据获取公共方法
+	function serializeToJson(selector, notEmptyField) {
+    	var obj = {};
+	    $.each($(selector).serializeArray(), function(i, o) {
+	        var n = o.name, v = isNaN(o.value) === true ? o.value: $.trim(o.value);
+	        if ( !(notEmptyField && "" == v)) {
+	        	obj[n] = (obj[n] === undefined) ? v: $.isArray(obj[n]) ? obj[n].concat(v): [obj[n], v];
+	        }
+	    });
+	    return obj;
+    }
+</script>
 </html>

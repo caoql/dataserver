@@ -12,4 +12,8 @@ public interface OperationService {
 	public ResponseInfo updateSelective(OperationVO vo);
 	
 	public ResponseInfo deleteByPrimaryKey(Integer id);
+
+	public ResponseInfo list(OperationParam param);
+	
+	public ResponseInfo selectByPrimaryKey(Integer id);
 }

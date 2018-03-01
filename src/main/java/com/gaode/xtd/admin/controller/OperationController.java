@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,13 +39,43 @@ public class OperationController {
 
 	// 数据过滤查询
 	@RequestMapping("/search")
-	public ResponseInfo searchList(OperationParam param, HttpServletRequest request) {
+	public ResponseInfo search(OperationParam param, HttpServletRequest request) {
 		ResponseInfo info = null;
 		try {
 			// 组装一下查询参数，为后面拼接sql做准备
 			Map<String, Object> queryMap = UriUtils.analyzeQuery(request.getQueryString());
 			param.setQuery(queryMap);
 			info = operationService.queryList(param);
+		} catch (ServiceException e) {
+			log.error(e.getMessage(), e);
+			info = new ResponseInfo();
+			info.code = e.getCode();
+			info.msg = e.getMsg();
+		} catch (DaoException e) {
+			log.error(e.getMessage(), e);
+			info = new ResponseInfo();
+			info.code = e.getCode();
+			info.msg = e.getMsg();
+		} catch (CommonException e) {
+			log.error(e.getMessage(), e);
+			info = new ResponseInfo();
+			info.code = e.getCode();
+			info.msg = e.getMsg();
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			info = new ResponseInfo();
+			info.code = ErrorCodeEnum.CALL_ERROR.getCode();
+			info.msg = ErrorCodeEnum.CALL_ERROR.getMsg();
+		}
+		return info;
+	}
+	
+	// 数据列表展示
+	@PostMapping("/list")
+	public ResponseInfo list(OperationParam param, HttpServletRequest request) {
+		ResponseInfo info = null;
+		try {
+			info = operationService.list(param);
 		} catch (ServiceException e) {
 			log.error(e.getMessage(), e);
 			info = new ResponseInfo();
@@ -138,6 +169,41 @@ public class OperationController {
 		log.debug("删除的ID为: " + id);
 		try {
 			info = operationService.deleteByPrimaryKey(id);
+		} catch (ServiceException e) {
+			log.error(e.getMessage(), e);
+			info = new ResponseInfo();
+			info.code = e.getCode();
+			info.msg = e.getMsg();
+		} catch (DaoException e) {
+			log.error(e.getMessage(), e);
+			info = new ResponseInfo();
+			info.code = e.getCode();
+			info.msg = e.getMsg();
+		} catch (CommonException e) {
+			log.error(e.getMessage(), e);
+			info = new ResponseInfo();
+			info.code = e.getCode();
+			info.msg = e.getMsg();
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			info = new ResponseInfo();
+			info.code = ErrorCodeEnum.CALL_ERROR.getCode();
+			info.msg = ErrorCodeEnum.CALL_ERROR.getMsg();
+		}
+		return info;
+	}
+	
+	/**
+	 * 查看
+	 * @param id
+	 * @return
+	 */
+	@GetMapping("/get")
+	public ResponseInfo selectByPrimaryKey(Integer id) {
+		ResponseInfo info = null;
+		log.debug("查看的ID为: " + id);
+		try {
+			info = operationService.selectByPrimaryKey(id);
 		} catch (ServiceException e) {
 			log.error(e.getMessage(), e);
 			info = new ResponseInfo();

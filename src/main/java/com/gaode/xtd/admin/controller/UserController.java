@@ -29,7 +29,7 @@ public class UserController {
 	private UserService userService;
 	
 	// 数据过滤查询
-	@RequestMapping(value="/search")
+	//@RequestMapping(value="/search")
 	@ResponseBody
 	public ResponseInfo searchList(UserParam param) {
 		ResponseInfo info = null;

@@ -28,6 +28,14 @@ public class OperationServiceImpl implements OperationService {
 	@Autowired
 	private OperationMapper operationMapper;
 	
+	@Override
+	public ResponseInfo list(OperationParam param) {
+		ResponseInfo info = new ResponseInfo();
+		List<OperationPO> result = operationMapper.queryList(param);
+		info.data = result;
+		return info;
+	}
+	
 	public ResponseInfo queryList(OperationParam param) {
 		ResponseInfo info = new ResponseInfo();
 		List<OperationPO> result = operationMapper.queryList(param);
@@ -159,6 +167,19 @@ public class OperationServiceImpl implements OperationService {
 			info.code = ErrorCodeEnum.DB_DELETE_ERROR.getCode();
 			info.msg = ErrorCodeEnum.DB_DELETE_ERROR.getMsg();
 		}
+		return info;
+	}
+
+	/**
+	 * 查看
+	 */
+	@Override
+	public ResponseInfo selectByPrimaryKey(Integer id) {
+		if (id == null) {
+			throw new ServiceException("查看ID不能为空");
+		}
+		ResponseInfo info = new ResponseInfo();
+		info.data = operationMapper.selectByPrimaryKey(id);
 		return info;
 	}
 

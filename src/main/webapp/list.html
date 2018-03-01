@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<title>数据服务列表</title>
+</head>
+<body>
+	<div class="panel panel-success">
+			<div id="app">
+				<div class="row">
+					<div class="col-sm-6">
+						<div class="panel panel-success">
+							<div class="panel-heading">数据服务列表</div>
+							<panel class="pane-body">
+								<table class="table">
+									<tr>
+										<th>操作名称</th>
+										<th>语句类型</th>
+										<th>模板</th>
+										<th>操作</th>
+									</tr>
+									<tr v-for="item in plist">
+										<td>{{item.operName}}</td>
+										<td>{{item.operType}}</td>
+										<td>{{item.text}}</td>
+										<td><a href="javascript:void(0)" v-on:click="edit(item)">编辑</a></td>
+										<td><a href="javascript:void(0)" v-on:click="remove(item.id)">删除</a></td>
+									</tr>
+								</table>
+							</panel>
+						</div>
+					</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script src="js/jquery-3.2.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/vue.min.js"></script>
+<script type="text/javascript">
+	$(function(){
+		// 向后台发送post请求
+		$.ajax({
+			type: 'POST',
+			url: '/dataserver/admin/operation/list',
+			data: null,
+			success: function(data) {
+				if (data && data.code == 0) {
+					app.plist = data.data;
+				} 
+			}
+		});
+	});
+	var app = new Vue({
+		el: '#app',
+		data: {
+			plist: []
+		},
+		methods: {
+			edit: function(item) {
+				console.log(item);
+				window.location.href = '/dataserver/edit.html?id=' + item.id;
+			},
+			remove: function(id) {
+				var flag = confirm("确定删除这条记录吗？");
+				if (flag) {
+					// 向后台发送delete请求
+					$.ajax({
+						type: 'DELETE',
+						url: '/dataserver/admin/operation/delete?id=' + id,
+						success: function(data) {
+							if (data && data.code == 0) {
+								alert("删除成功");
+								window.location.href = '/dataserver/list.html';
+							} else {
+								alert(data.msg);
+							}
+						},
+						error: function(data) {
+							console.log(data);
+							alert("删除失败");
+						}
+					});
+				}
+			}
+		}
+	});
+</script>
+</html>

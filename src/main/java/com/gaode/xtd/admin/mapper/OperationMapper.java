@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.gaode.xtd.admin.domain.dto.OperationDTO;
 import com.gaode.xtd.admin.domain.po.OperationPO;
 import com.gaode.xtd.admin.domain.query.OperationParam;
 
@@ -15,6 +16,10 @@ public interface OperationMapper {
     int insertSelective(OperationPO record);
 
     OperationPO selectByPrimaryKey(Integer id);
+    
+    OperationDTO selectOperAndParamByKey(Integer id);
+    
+    List<OperationDTO> queryDtos(Map<String, Object> map);
 
     int updateByPrimaryKeySelective(OperationPO record);
     

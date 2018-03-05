@@ -11,15 +11,26 @@
 	<context:property-placeholder location="classpath:jdbc.properties"
 		ignore-unresolvable="true" />
 
+	<!-- 动态数据源，可做数据源切换 -->
+	<bean id="dynamicDataSource" class="com.gaode.xtd.common.config.DynamicDataSource">      
+	<property name="targetDataSources">  
+	    <map key-type="java.lang.String">      
+	        <entry value-ref="dafaultDataSource" key="dafaultDataSource"></entry> 
+	    </map>      
+	</property>    
+	<!-- 默认使用dataSourceSig的数据源 -->    
+	<property name="defaultTargetDataSource" ref="dafaultDataSource"></property>         
+	</bean>  
+
 	<!-- 数据源 -->
-	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"
+	<bean id="dafaultDataSource" class="org.apache.commons.dbcp2.BasicDataSource"
 		p:driverClassName="${jdbc.driver}" p:url="${jdbc.url}" p:username="${jdbc.username}"
 		p:password="${jdbc.password}" />
 
 	<!-- 配置sqlsessionFactory -->
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<!-- 数据库连接池 -->
-		<property name="dataSource" ref="dataSource" />
+		<property name="dataSource" ref="dynamicDataSource" />
 		<!-- 加载Mybatis全局配置文件 -->
 		<property name="configLocation" value="classpath:mybatis/sqlMapConfig.xml" />
 	</bean>
@@ -28,7 +39,7 @@
 	<bean id="transactionManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<!-- 配置数据源 -->
-		<property name="dataSource" ref="dataSource" />
+		<property name="dataSource" ref="dynamicDataSource" />
 	</bean>
 
 	<!-- 开启注解事务 -->

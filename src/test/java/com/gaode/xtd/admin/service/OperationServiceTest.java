@@ -1,8 +1,5 @@
 package com.gaode.xtd.admin.service;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +17,11 @@ public class OperationServiceTest {
 
 	@Autowired
 	private OperationService operationService;
-
+	
 	@Test
 	public void testQueryList() {
 		OperationParam param = new OperationParam();
-		param.setOperName("aa");
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("age", 27);
-		param.setQuery(map);
+		param.setOperName("tt");
 		ResponseInfo info = operationService.queryList(param);
 		System.out.println(info.data);
 	}

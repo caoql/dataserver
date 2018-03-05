@@ -12,14 +12,71 @@
 		<result column="creator" property="creator" />
 		<result column="update_time" property="updateTime" />
 		<result column="updator" property="updator" />
+		<result column="sqltemplate" property="sqltemplate" />
+		<result column="datasource_id" property="datasourceId" />
+		<result column="datasource_name" property="datasourceName" />
+	</resultMap>
+	
+	<resultMap id="OperAndParamMap" type="com.gaode.xtd.admin.domain.dto.OperationDTO" extends="BaseResultMap">
+		<collection property="paramList" ofType="com.gaode.xtd.admin.domain.po.QueryparameterPO">
+			<id column="pid" property="pid" />
+			<result column="pname" property="pname" />
+			<result column="ptype" property="ptype" />
+			<result column="pdirection" property="pdirection" />
+		</collection>
+	</resultMap>
+	
+	<resultMap id="queryDtos_Map" type="com.gaode.xtd.admin.domain.dto.OperationDTO" extends="OperAndParamMap">
+		<association property="datasourceconfig" javaType="com.gaode.xtd.admin.domain.po.DatasourceconfigPO">
+			<id column="c_id" property="id" />
+			<result column="name" property="name" />
+			<result column="is_use" property="isUse" />
+		</association>
 	</resultMap>
 
 	<sql id="Base_Column_List">
 		id, oper_name, oper_type, is_return, text, remark, create_time,
 		creator,
-		update_time, updator
+		update_time, updator, sqltemplate,datasource_id,datasource_name
 	</sql>
 
+	<select id="queryDtos" resultMap="queryDtos_Map">
+		SELECT
+			o.id,
+			o.oper_name,
+			o.oper_type,
+			o.sqltemplate,
+			param.pid,
+			param.pname,
+			param.ptype,
+			param.pdirection,
+			config.id AS c_id, 
+			config.name, 
+			config.is_use
+		FROM
+			operation O
+		LEFT JOIN queryparameter param ON O.id = param.mid
+		LEFT JOIN datasourceconfig config ON O.d_id = config.id
+	</select>
+	
+	<select id="selectOperAndParamByKey" resultMap="OperAndParamMap">
+		SELECT
+			o.id,
+			o.oper_name,
+			o.oper_type,
+			o.sqltemplate,
+			o.datasource_id,
+			o.datasource_name,
+			param.pid,
+			param.pname,
+			param.ptype,
+			param.pdirection
+		FROM
+			operation O
+		LEFT JOIN queryparameter param ON O.id = param.mid
+		where o.id = #{id}
+	</select>
+	
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
 		select
 		<include refid="Base_Column_List" />
@@ -73,6 +130,15 @@
 			<if test="updator != null">
 				updator,
 			</if>
+			<if test="sqltemplate != null">
+				sqltemplate,
+			</if>
+			<if test="datasourceId != null">
+				datasource_id,
+			</if>
+			<if test="datasourceName != null">
+				datasource_name,
+			</if>
 		</trim>
 		<trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="operName != null">
@@ -102,6 +168,15 @@
 			<if test="updator != null">
 				#{updator},
 			</if>
+			<if test="sqltemplate != null">
+				#{sqltemplate},
+			</if>
+			<if test="datasourceId != null">
+				#{datasourceId},
+			</if>
+			<if test="datasourceName != null">
+				#{datasourceName},
+			</if>
 		</trim>
 	</insert>
 
@@ -128,6 +203,15 @@
 			</if>
 			<if test="updator != null">
 				updator = #{updator},
+			</if>
+			<if test="sqltemplate != null">
+				sqltemplate = #{sqltemplate},
+			</if>
+			<if test="datasourceId != null">
+				datasource_id = #{datasourceId},
+			</if>
+			<if test="datasourceName != null">
+				datasource_name = #{datasourceName},
 			</if>
 		</set>
 		where id = #{id}

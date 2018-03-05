@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
  * 2018-3-1
  */
 public class SimpleCORSFilter implements Filter {
-
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
 	}

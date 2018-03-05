@@ -14,4 +14,13 @@ public final class SystemConstant {
 	public static final String IS_YES = "1";
 	public static final String IS_NOT = "0";
 	
+	// 存储过程参数方向
+	public static final String P_DIRECTION_IN = "IN";
+	public static final String P_DIRECTION_OUT = "OUT";
+	
+	// 模式
+	public static final String MODEL_ADD = "ADD";
+	public static final String MODEL_UPDATE = "UPDATE";
+	
+	
 }

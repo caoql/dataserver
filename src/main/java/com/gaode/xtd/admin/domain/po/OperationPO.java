@@ -25,6 +25,8 @@ public class OperationPO implements Serializable {
 	private String isReturn;
 	// 储存脚本内容
 	private String text;
+	// 模板
+	private String sqltemplate;
 
 	private String remark;
 
@@ -35,7 +37,12 @@ public class OperationPO implements Serializable {
 	private Date updateTime;
 
 	private String updator;
-
+	
+	// 数据服务ID
+	private Integer datasourceId;
+	// 冗余的数据服务名字
+	private String datasourceName;
+		
 	@Override
 	public String toString() {
 		return ObjReflect.toString(this);
@@ -76,6 +83,14 @@ public class OperationPO implements Serializable {
 
 	public String getText() {
 		return text;
+	}
+
+	public String getSqltemplate() {
+		return sqltemplate;
+	}
+
+	public void setSqltemplate(String sqltemplate) {
+		this.sqltemplate = sqltemplate == null ? null : sqltemplate.trim();
 	}
 
 	public void setText(String text) {
@@ -120,5 +135,21 @@ public class OperationPO implements Serializable {
 
 	public void setUpdator(String updator) {
 		this.updator = updator == null ? null : updator.trim();
+	}
+
+	public Integer getDatasourceId() {
+		return datasourceId;
+	}
+
+	public void setDatasourceId(Integer datasourceId) {
+		this.datasourceId = datasourceId;
+	}
+
+	public String getDatasourceName() {
+		return datasourceName;
+	}
+
+	public void setDatasourceName(String datasourceName) {
+		this.datasourceName = datasourceName == null ? null : datasourceName.trim();
 	}
 }

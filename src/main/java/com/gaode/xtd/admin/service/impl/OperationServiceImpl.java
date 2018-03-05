@@ -11,13 +11,19 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.gaode.xtd.admin.domain.po.OperationPO;
+import com.gaode.xtd.admin.domain.po.QueryparameterPO;
 import com.gaode.xtd.admin.domain.query.OperationParam;
 import com.gaode.xtd.admin.domain.vo.OperationVO;
+import com.gaode.xtd.admin.domain.vo.QueryparameterVO;
+import com.gaode.xtd.admin.mapper.DatasourceconfigMapper;
 import com.gaode.xtd.admin.mapper.OperationMapper;
+import com.gaode.xtd.admin.mapper.QueryparameterMapper;
 import com.gaode.xtd.admin.service.OperationService;
 import com.gaode.xtd.common.SystemConstant;
+import com.gaode.xtd.common.config.DataSourceContextHolder;
 import com.gaode.xtd.common.enums.ErrorCodeEnum;
 import com.gaode.xtd.common.exception.ServiceException;
 import com.gaode.xtd.common.info.ResponseInfo;
@@ -27,6 +33,12 @@ public class OperationServiceImpl implements OperationService {
 
 	@Autowired
 	private OperationMapper operationMapper;
+	
+	@Autowired
+	private QueryparameterMapper queryparameterMapper;
+	
+	@Autowired
+	private DatasourceconfigMapper datasourceconfigMapper;
 	
 	@Override
 	public ResponseInfo list(OperationParam param) {
@@ -53,6 +65,8 @@ public class OperationServiceImpl implements OperationService {
 						temp.put(key, value);
 					}
 				}
+				// 切换数据源进行执行
+				DataSourceContextHolder.setDBType(po.getDatasourceName()); 
 				// 1.SQL
 				if (SystemConstant.OPER_TYPE_A.equals(po.getOperType())) {
 					info.data = operationMapper.executeSql(po.getText(), paramMap);
@@ -83,69 +97,134 @@ public class OperationServiceImpl implements OperationService {
 	 * 新增
 	 */
 	@Override
+	@Transactional
 	public ResponseInfo insertSelective(OperationVO vo) {
+		validate(vo, SystemConstant.MODEL_ADD);
+		ResponseInfo info = new ResponseInfo();
+		OperationPO record = vo.toPO();
+		// 跟踪信息
+		record.setCreateTime(new Date());
+		int result = operationMapper.insertSelective(record);
+		if (result != 1) {
+			throw new ServiceException(ErrorCodeEnum.DB_INSERT_ERROR);
+		}
+		
+		List<QueryparameterPO> polist = vo.toQueryparameterPO();
+		for (QueryparameterPO queryPO: polist) {
+			queryPO.setMid(record.getId());// 关联操作表的id
+			int r = queryparameterMapper.insertSelective(queryPO);
+			if (r != 1) {
+				throw new ServiceException(ErrorCodeEnum.DB_INSERT_ERROR);
+			}
+		}
+		
+		return info;
+	}
+
+	// 新增和修改校验
+	private void validate(OperationVO vo,String model) {
 		if (vo == null) {
-			throw new ServiceException("新增的内容不能为空");
+			throw new ServiceException("数据服务接口配置不能为空");
+		}
+		if (SystemConstant.MODEL_UPDATE.equals(model) && vo.getId() == null) {
+			throw new ServiceException("ID不能为空");
 		}
 		if (StringUtils.isBlank(vo.getOperName())) {
-			throw new ServiceException("新增内容的<操作名称>不能为空");
+			throw new ServiceException("<操作名称>不能为空");
 		}
 		// 检查operName是否重复
 		OperationParam param = new OperationParam();
 		param.setOperName(vo.getOperName());
 		List<OperationPO> list = operationMapper.queryList(param);
 		if (list != null && list.size() > 0) {
-			throw new ServiceException("文本名字(oper_name):" + vo.getOperName() + "已经存在，不能重复");
+			if (SystemConstant.MODEL_ADD.equals(model)) {
+				throw new ServiceException("<操作名称>(oper_name):" + vo.getOperName() + "已经存在，不能重复");
+			} else if (SystemConstant.MODEL_UPDATE.equals(model)) {
+				for (OperationPO po : list) {
+					// 查询出所有这个operName名字的，只要他们的ID有一个和编辑数据的ID不同，就认为已经存在这个operName
+					if (!Objects.equals(po.getId(), vo.getId())) {
+						throw new ServiceException("<操作名称>(oper_name):" + vo.getOperName() + "已经存在，不能重复");
+					}
+				}
+			}
 		}
-		ResponseInfo info = new ResponseInfo();
-		OperationPO record = vo.toPO();
-		// 跟踪信息
-		record.setCreateTime(new Date());
-		
-		int result = operationMapper.insertSelective(record);
-		if (result != 1) {
-			info.code = ErrorCodeEnum.DB_INSERT_ERROR.getCode();
-			info.msg = ErrorCodeEnum.DB_INSERT_ERROR.getMsg();
+		String operType = vo.getOperType();
+		if (StringUtils.isBlank(operType)) {
+			throw new ServiceException("<语句类型>不能为空");
 		}
-		return info;
+		if (StringUtils.isBlank(vo.getSqltemplate())) {
+			throw new ServiceException("<模板>不能为空");
+		}
+		if (vo.getDatasourceId() == null || StringUtils.isBlank(vo.getDatasourceName())) {
+			throw new ServiceException("<数据源>不能为空");
+		}
+		String sqltemplate = vo.getSqltemplate();
+		// 默认没有返回值
+		String isReturn = SystemConstant.IS_NOT;
+		List<QueryparameterVO> plist = vo.getQueryParamList();
+		if (plist != null) {
+			for (QueryparameterVO parameterVO: plist) {
+				// 参数名称
+				String pname = parameterVO.getPname();
+				if (StringUtils.isBlank(pname)) {
+					throw new ServiceException("<参数名称>不能为空");
+				}
+				// SQL语句
+				if (SystemConstant.OPER_TYPE_A.equals(operType)) {
+					pname = "#{param." + pname.substring(1) + "}";
+				} else if (SystemConstant.OPER_TYPE_B.equals(operType)) {// 储存过程
+					// 参数类型
+					String ptype =parameterVO.getPtype();
+					// 输入/输出
+					String pdirection = parameterVO.getPdirection();
+					if (StringUtils.isBlank(ptype)) {
+						throw new ServiceException(pname + "的<参数类型>不能为空");
+					}
+					if (StringUtils.isBlank(pdirection)) {
+						throw new ServiceException(pname + "的<输入/输出>不能为空");
+					}
+					if (SystemConstant.P_DIRECTION_OUT.equals(pdirection)) {// 存储过程是否有返回值
+						isReturn = SystemConstant.IS_YES;
+					}
+					pname = "#{param." + pname.substring(1) + ",jdbcType=" + ptype + ",mode=" + pdirection + "}";
+				}
+				sqltemplate = sqltemplate.replace(parameterVO.getPname(), pname);
+			}
+		}
+		vo.setIsReturn(isReturn);
+		vo.setText(sqltemplate);
 	}
-
+	
 	/**
 	 * 修改
 	 */
 	@Override
+	@Transactional
 	public ResponseInfo updateSelective(OperationVO vo) {
-		if (vo == null) {
-			throw new ServiceException("修改的内容不能为空");
-		}
-		if (vo.getId() == null) {
-			throw new ServiceException("修改内容的ID不能为空");
-		}
-		if (StringUtils.isBlank(vo.getOperName())) {
-			throw new ServiceException("修改内容的<操作名称>不能为空");
-		}
-		// 还要校验operName是否重复
-		OperationParam param = new OperationParam();
-		param.setOperName(vo.getOperName());
-		List<OperationPO> list = operationMapper.queryList(param);
-		if (list != null && list.size() > 0) {
-			for (OperationPO po : list) {
-				// 查询出所有这个operName名字的，只要他们的ID有一个和编辑数据的ID不同，就认为已经存在这个operName
-				if (!Objects.equals(po.getId(), vo.getId())) {
-					throw new ServiceException("文本名字(oper_name):" + vo.getOperName() + "已经存在，不能重复");
-				}
-			}
-		}
+		// 校验
+		validate(vo, SystemConstant.MODEL_UPDATE);
 		ResponseInfo info = new ResponseInfo();
 		OperationPO record = vo.toPO();
 		// 跟踪信息
 		record.setUpdateTime(new Date());
-		
 		int result = operationMapper.updateByPrimaryKeySelective(record);
 		if (result != 1) {
-			info.code = ErrorCodeEnum.DB_UPDATE_ERROR.getCode();
-			info.msg = ErrorCodeEnum.DB_UPDATE_ERROR.getMsg();
+			throw new ServiceException(ErrorCodeEnum.DB_UPDATE_ERROR);
 		}
+		
+		// 参数配置先删后插入
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("mid", record.getId());
+		queryparameterMapper.deleteByMap(map);
+		List<QueryparameterPO> polist = vo.toQueryparameterPO();
+		for (QueryparameterPO queryPO: polist) {
+			queryPO.setMid(record.getId());// 关联操作表的id
+			int r = queryparameterMapper.insertSelective(queryPO);
+			if (r != 1) {
+				throw new ServiceException(ErrorCodeEnum.DB_INSERT_ERROR);
+			}
+		}
+		
 		return info;
 	}
 
@@ -153,10 +232,15 @@ public class OperationServiceImpl implements OperationService {
 	 * 删除
 	 */
 	@Override
+	@Transactional
 	public ResponseInfo deleteByPrimaryKey(Integer id) {
 		if (id == null) {
 			throw new ServiceException("删除ID不能为空");
 		}
+		// 先删除关联表
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("mid", id);
+		queryparameterMapper.deleteByMap(map);
 		OperationPO po = operationMapper.selectByPrimaryKey(id);
 		if (po == null) {
 			throw new ServiceException("ID为:" + id + "的数据记录不存在,不能删除");
@@ -179,7 +263,7 @@ public class OperationServiceImpl implements OperationService {
 			throw new ServiceException("查看ID不能为空");
 		}
 		ResponseInfo info = new ResponseInfo();
-		info.data = operationMapper.selectByPrimaryKey(id);
+		info.data = operationMapper.selectOperAndParamByKey(id);
 		return info;
 	}
 

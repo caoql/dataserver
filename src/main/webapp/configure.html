@@ -16,7 +16,6 @@
 		</div>
 		<div class="panel-body" style="padding-top: 5px; padding-bottom: 5px;">
 			<form id="formTemple">
-				<input type="hidden" id="id" name="id">
 				<div class="form-group">
 					<label for="operName">操作名称</label> <input type="text"
 						class="form-control" id="operName" name="operName" placeholder="操作名称(不超过20个字符，不要包含特殊字符，如？，&，#等，最好都是英文字母)" maxlength="20" required:true>
@@ -122,33 +121,8 @@
 		}
 	});
 
-	// 回显设置
-	function reset(data) {
-		$('#id').val(data.id);
-		$('#operName').val(data.operName);
-		$('#operType').val(data.operType);
-		$('#sqltemplate').val(data.sqltemplate);
-		$('#datasourceId').val(data.datasourceId);
-		app.plist = data.paramList == null ? [] : data.paramList;
-	}
-	
-	//页面加载完执行
+	// 页面加载完执行
 	$(function(){
-		var url = window.location.href;
-		var query = url.substring(url.indexOf("?"));
-		// 向后台发送post请求
-		$.ajax({
-			type: 'GET',
-			url: $$.appId + '/admin/operation/get' + query,
-			success: function(data) {
-				if (data && data.code == 0) {
-					if (data.data != null) {
-						reset(data.data);
-					}
-				} 
-			}
-		});
-		
 		//解析字符参数,程序会自动的提取":"开始以空格或者逗号结尾的单词
 		/*example:select * from user where usernmae=:name and id=:id
 		 程序会自动的提取:name及:id两个参数
@@ -156,15 +130,15 @@
 		$("#btnExplain").click(function() {
 			app.plist = $$.explain('#sqltemplate', app.plist);
 		});
-
-		// 操作说明下载
-		$('#btnOperation').click(function(){
-			window.location.href = $$.appId +  '/download/数据接口操配置文档.docx';
-		});
 		
 		// 返回列表
 		$("#btnReturn").click(function() {
 			window.location.href =  $$.appId + '/list.html';
+		});
+
+		// 操作说明下载
+		$('#btnOperation').click(function(){
+			window.location.href = $$.appId + '/download/数据接口操配置文档.docx';
 		});
 		
 		//点击保存提交表格信息
@@ -204,13 +178,13 @@
 			// 向后台发送post请求
 			$.ajax({
 				type: 'POST',
-				url: $$.appId + '/admin/operation/update',
+				url: $$.appId + '/admin/operation/add',
 				data: JSON.stringify(formData),
 				contentType: 'application/json',
 				success: function(data) {
 					if (data && data.code == 0) {
 						alert("操作成功");
-						window.location.href = $$.appId + '/list.html';
+						window.location.href = $$.appId + '/configure.html';
 					} else {
 						alert(data.msg);
 					}

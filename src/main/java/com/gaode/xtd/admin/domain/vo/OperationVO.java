@@ -1,8 +1,11 @@
 package com.gaode.xtd.admin.domain.vo;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.gaode.xtd.admin.domain.po.OperationPO;
+import com.gaode.xtd.admin.domain.po.QueryparameterPO;
 import com.gaode.xtd.common.reflect.ObjReflect;
 
 /**
@@ -20,12 +23,20 @@ public class OperationVO implements Serializable {
 	private String operName;
 	// 存储文本类型,A:sql,B:存储过程
 	private String operType;
-	// 存储过程是否有返回值，既out参数(1：是，0：否）
-	private String isReturn;
-	// 储存脚本内容
-	private String text;
+	// 模板
+	private String sqltemplate;
 	private String remark;
-
+	// 是否有返回值
+	private String isReturn;
+	// 存储脚本
+	private String text;
+	// 参数列表
+	private List<QueryparameterVO> queryParamList;
+	
+	// 数据服务ID
+	private Integer datasourceId;
+	// 冗余的数据服务名字
+	private String datasourceName;
 	/**
 	 * 转换成PO
 	 * @return
@@ -35,10 +46,28 @@ public class OperationVO implements Serializable {
 		po.setId(id);
 		po.setOperName(operName);
 		po.setOperType(operType);
-		po.setIsReturn(isReturn);
-		po.setText(text);
+		po.setSqltemplate(sqltemplate);
 		po.setRemark(remark);
+		po.setText(text);
+		po.setIsReturn(isReturn);
+		po.setDatasourceId(datasourceId);
+		po.setDatasourceName(datasourceName);
 		return po;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public List<QueryparameterPO> toQueryparameterPO() {
+		List<QueryparameterPO> list = new ArrayList<QueryparameterPO>();
+		if (queryParamList != null) {
+			for (QueryparameterVO queryParam: queryParamList) {
+				QueryparameterPO po = queryParam.toPO();
+				list.add(po);
+			}
+		}
+		return list;
 	}
 	
 	@Override
@@ -70,7 +99,14 @@ public class OperationVO implements Serializable {
 		this.operType = operType == null ? null : operType.trim();
 	}
 
-	
+	public String getSqltemplate() {
+		return sqltemplate;
+	}
+
+	public void setSqltemplate(String sqltemplate) {
+		this.sqltemplate = sqltemplate == null ? null : sqltemplate.trim();
+	}
+
 	public String getIsReturn() {
 		return isReturn;
 	}
@@ -93,5 +129,29 @@ public class OperationVO implements Serializable {
 
 	public void setRemark(String remark) {
 		this.remark = remark == null ? null : remark.trim();
+	}
+
+	public List<QueryparameterVO> getQueryParamList() {
+		return queryParamList;
+	}
+
+	public void setQueryParamList(List<QueryparameterVO> queryParamList) {
+		this.queryParamList = queryParamList;
+	}
+	
+	public Integer getDatasourceId() {
+		return datasourceId;
+	}
+
+	public void setDatasourceId(Integer datasourceId) {
+		this.datasourceId = datasourceId;
+	}
+
+	public String getDatasourceName() {
+		return datasourceName;
+	}
+
+	public void setDatasourceName(String datasourceName) {
+		this.datasourceName = datasourceName == null ? null : datasourceName.trim();
 	}
 }

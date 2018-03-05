@@ -5,11 +5,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import com.gaode.xtd.admin.domain.dto.OperationDTO;
 
 /**
  * OperationMapper 的单元测试
@@ -41,5 +44,13 @@ public class OperationMapperTest {
 		//存储过程的返回值不用新的map接受，值回传在参数里面的map里面
 		System.out.println(map.get("pro_out"));
 	}
-
+	
+	@Test
+	public void testSelectOperAndParamByKey() {
+		int id = 22;
+		OperationDTO result = mapper.selectOperAndParamByKey(id);
+		Assert.assertEquals(2, result.getParamList().size());
+		System.out.println(result);
+		System.out.println(result.getParamList());
+	}
 }

@@ -14,18 +14,21 @@
 					<div class="col-sm-6">
 						<div class="panel panel-success">
 							<div class="panel-heading">数据服务列表</div>
+							<button class="btn btn-info" type="button"  v-on:click="add()">新增</button>
 							<panel class="pane-body">
 								<table class="table">
 									<tr>
 										<th>操作名称</th>
 										<th>语句类型</th>
 										<th>模板</th>
+										<th>数据源</th>
 										<th>操作</th>
 									</tr>
 									<tr v-for="item in plist">
 										<td>{{item.operName}}</td>
-										<td>{{item.operType}}</td>
-										<td>{{item.text}}</td>
+										<td>{{item.operType == 'A' ? 'sql语句' : (item.operType == 'B' ? '存储过程' : item.operType)}}</td>
+										<td>{{item.sqltemplate}}</td>
+										<td>{{item.datasourceName}}</td>
 										<td><a href="javascript:void(0)" v-on:click="edit(item)">编辑</a></td>
 										<td><a href="javascript:void(0)" v-on:click="remove(item.id)">删除</a></td>
 									</tr>
@@ -40,12 +43,13 @@
 <script src="js/jquery-3.2.1.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/vue.min.js"></script>
+<script src="js/common.js"></script>
 <script type="text/javascript">
 	$(function(){
 		// 向后台发送post请求
 		$.ajax({
 			type: 'POST',
-			url: '/dataserver/admin/operation/list',
+			url: $$.appId + '/admin/operation/list',
 			data: null,
 			success: function(data) {
 				if (data && data.code == 0) {
@@ -60,9 +64,11 @@
 			plist: []
 		},
 		methods: {
+			add: function() {
+				window.location.href =  $$.appId + '/configure.html';
+			},
 			edit: function(item) {
-				console.log(item);
-				window.location.href = '/dataserver/edit.html?id=' + item.id;
+				window.location.href =  $$.appId + '/edit.html?id=' + item.id;
 			},
 			remove: function(id) {
 				var flag = confirm("确定删除这条记录吗？");
@@ -70,11 +76,11 @@
 					// 向后台发送delete请求
 					$.ajax({
 						type: 'DELETE',
-						url: '/dataserver/admin/operation/delete?id=' + id,
+						url: $$.appId +'/admin/operation/delete?id=' + id,
 						success: function(data) {
 							if (data && data.code == 0) {
 								alert("删除成功");
-								window.location.href = '/dataserver/list.html';
+								window.location.href = $$.appId +'/list.html';
 							} else {
 								alert(data.msg);
 							}

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gaode.xtd.admin.mapper.QueryparameterMapper">
+	<resultMap id="BaseResultMap"
+		type="com.gaode.xtd.admin.domain.po.QueryparameterPO">
+		<id column="pid" property="pid" />
+		<result column="pname" property="pname" />
+		<result column="ptype" property="ptype" />
+		<result column="pdirection" property="pdirection" />
+		<result column="mid" property="mid" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		pid, pname, ptype, pdirection, mid
+	</sql>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from queryparameter
+		where pid = #{pid}
+	</select>
+
+	<delete id="deleteByPrimaryKey">
+		delete from queryparameter
+		where pid = #{pid}
+	</delete>
+	
+	<delete id="deleteByMap">
+		delete from queryparameter
+		<where>
+			<if test="mid != null">
+				AND mid = #{mid}
+			</if>
+		</where>
+	</delete>
+
+	<insert id="insertSelective" useGeneratedKeys="true"
+		keyProperty="pid">
+		insert into queryparameter
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="pname != null">
+				pname,
+			</if>
+			<if test="ptype != null">
+				ptype,
+			</if>
+			<if test="pdirection != null">
+				pdirection,
+			</if>
+			<if test="mid != null">
+				mid,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="pname != null">
+				#{pname},
+			</if>
+			<if test="ptype != null">
+				#{ptype},
+			</if>
+			<if test="pdirection != null">
+				#{pdirection},
+			</if>
+			<if test="mid != null">
+				#{mid},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="updateByPrimaryKeySelective">
+		update queryparameter
+		<set>
+			<if test="pname != null">
+				pname = #{pname},
+			</if>
+			<if test="ptype != null">
+				ptype = #{ptype},
+			</if>
+			<if test="pdirection != null">
+				pdirection = #{pdirection},
+			</if>
+			<if test="mid != null">
+				mid = #{mid},
+			</if>
+		</set>
+		where pid = #{pid}
+	</update>
+</mapper>

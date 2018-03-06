@@ -22,5 +22,6 @@ public final class SystemConstant {
 	public static final String MODEL_ADD = "ADD";
 	public static final String MODEL_UPDATE = "UPDATE";
 	
-	
+	// 默认数据源-和applicationContext-dao.xml中的默认数据源关联的bean的ID一致
+	public static final String DEFAULT_DS = "defaultDataSource";
 }

@@ -15,15 +15,15 @@
 	<bean id="dynamicDataSource" class="com.gaode.xtd.common.config.DynamicDataSource">      
 	<property name="targetDataSources">  
 	    <map key-type="java.lang.String">      
-	        <entry value-ref="dafaultDataSource" key="dafaultDataSource"></entry> 
+	        <entry value-ref="defaultDataSource" key="defaultDataSource"></entry> 
 	    </map>      
 	</property>    
-	<!-- 默认使用dataSourceSig的数据源 -->    
-	<property name="defaultTargetDataSource" ref="dafaultDataSource"></property>         
+	<!-- 默认使用defaultDataSource的数据源 -->    
+	<property name="defaultTargetDataSource" ref="defaultDataSource"></property>         
 	</bean>  
 
 	<!-- 数据源 -->
-	<bean id="dafaultDataSource" class="org.apache.commons.dbcp2.BasicDataSource"
+	<bean id="defaultDataSource" class="org.apache.commons.dbcp2.BasicDataSource"
 		p:driverClassName="${jdbc.driver}" p:url="${jdbc.url}" p:username="${jdbc.username}"
 		p:password="${jdbc.password}" />
 

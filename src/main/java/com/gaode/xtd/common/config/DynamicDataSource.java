@@ -2,7 +2,6 @@ package com.gaode.xtd.common.config;
 
 import java.util.Map;
 
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.log4j.Logger;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
@@ -22,15 +21,9 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
 
 	@Override
 	public void setTargetDataSources(Map<Object, Object> targetDataSources) {
+		// 自己设置多数据源
 		Map<Object, Object> map = DataSourceManger.getDatasourcesByJDBC();
-		if (!map.containsKey("dafaultDataSource")) {
-			BasicDataSource dafaultDataSource = new BasicDataSource();
-			dafaultDataSource.setDriverClassName("com.mysql.jdbc.Driver");
-			dafaultDataSource.setUrl("jdbc:mysql://127.0.0.1:3306/dataserver");
-			dafaultDataSource.setUsername("root");
-			dafaultDataSource.setPassword("root");
-			map.put("dafaultDataSource", dafaultDataSource);
-		}
 		super.setTargetDataSources(map);
 	}
+	
 }

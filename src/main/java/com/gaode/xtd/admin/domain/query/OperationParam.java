@@ -3,6 +3,8 @@ package com.gaode.xtd.admin.domain.query;
 import java.io.Serializable;
 import java.util.Map;
 
+import javax.validation.constraints.NotNull;
+
 import com.gaode.xtd.common.reflect.ObjReflect;
 
 /**
@@ -17,6 +19,7 @@ public class OperationParam implements Serializable {
 	private static final long serialVersionUID = 3312204907463566518L;
 	
 	// 文本名字
+	@NotNull(message="operName字段不能为空")
 	private String operName;
 
 	// 查询用户表的一些跟踪条件封装

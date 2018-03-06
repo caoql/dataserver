@@ -12,4 +12,6 @@ public class ResponseInfo {
 	public String msg = "操作成功";
 	// 返回的具体数据
 	public Object data;
+	// 特殊的返回值,如存储过程
+	public Object out;
 }

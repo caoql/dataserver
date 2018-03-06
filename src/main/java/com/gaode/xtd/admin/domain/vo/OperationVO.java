@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 import com.gaode.xtd.admin.domain.po.OperationPO;
 import com.gaode.xtd.admin.domain.po.QueryparameterPO;
 import com.gaode.xtd.common.reflect.ObjReflect;
@@ -18,25 +21,46 @@ public class OperationVO implements Serializable {
 	 * 序列号
 	 */
 	private static final long serialVersionUID = -8321410386041533202L;
+	
 	private Integer id;
 	// 文本名字
+	@NotNull(message="操作名称不能为空")
+	@Size(max=40,message="操作名称最多40个字符")
 	private String operName;
+	
 	// 存储文本类型,A:sql,B:存储过程
+	@NotNull(message="语句类型不能为空")
+	@Size(max=10,message="语句类型最多10个字符")
 	private String operType;
+	
 	// 模板
+	@NotNull(message="模板不能为空")
+	@Size(max=2500,message="模板最多2500个字符")
 	private String sqltemplate;
+	
+	@Size(max=255,message="备注最多255个字符")
 	private String remark;
+	
 	// 是否有返回值
+	@Size(max=1,message="是否有返回值最多1个字符")
 	private String isReturn;
+	
 	// 存储脚本
+	@Size(max=2500,message="存储脚本最多2500个字符")
 	private String text;
+	
 	// 参数列表
 	private List<QueryparameterVO> queryParamList;
 	
 	// 数据服务ID
+	@NotNull(message="数据源Id(datasourceId)在接口发送的时候不能为空")
 	private Integer datasourceId;
+	
 	// 冗余的数据服务名字
+	@NotNull(message="数据源不能为空")
+	@Size(max=2500,message="数据源最多40个字符")
 	private String datasourceName;
+	
 	/**
 	 * 转换成PO
 	 * @return
@@ -56,7 +80,7 @@ public class OperationVO implements Serializable {
 	}
 	
 	/**
-	 * 
+	 * 参数转化
 	 * @return
 	 */
 	public List<QueryparameterPO> toQueryparameterPO() {

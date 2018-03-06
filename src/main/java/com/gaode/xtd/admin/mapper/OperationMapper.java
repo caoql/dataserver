@@ -17,13 +17,14 @@ public interface OperationMapper {
 
     OperationPO selectByPrimaryKey(Integer id);
     
+    int updateByPrimaryKeySelective(OperationPO record);
+    
+    // operation表的数据列表
+    List<OperationPO> queryList(OperationParam param);
+    
     OperationDTO selectOperAndParamByKey(Integer id);
     
     List<OperationDTO> queryDtos(Map<String, Object> map);
-
-    int updateByPrimaryKeySelective(OperationPO record);
-    
-    List<OperationPO> queryList(OperationParam param);
     
     // 执行调用SQL
     List<LinkedHashMap<String, Object>> executeSql(@Param("sql")String sql, @Param("param")Map<String, Object> map);

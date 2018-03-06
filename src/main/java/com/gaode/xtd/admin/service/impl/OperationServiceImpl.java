@@ -2,7 +2,6 @@ package com.gaode.xtd.admin.service.impl;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -28,34 +27,54 @@ import com.gaode.xtd.common.enums.ErrorCodeEnum;
 import com.gaode.xtd.common.exception.ServiceException;
 import com.gaode.xtd.common.info.ResponseInfo;
 
+/**
+ * 操作Service
+ * @author andyc
+ * 2018-2-26
+ * @modify 2018-3-6
+ */
 @Service
 public class OperationServiceImpl implements OperationService {
 
+	// 注入操作Mapper
 	@Autowired
 	private OperationMapper operationMapper;
 	
+	// 注入参数Mapper
 	@Autowired
 	private QueryparameterMapper queryparameterMapper;
 	
+	// 注入数据源配置Mapper
 	@Autowired
 	private DatasourceconfigMapper datasourceconfigMapper;
 	
+	// 数据列表展示
 	@Override
 	public ResponseInfo list(OperationParam param) {
+		// 切换数据源进行执行-默认数据源
+		DataSourceContextHolder.setDBType(SystemConstant.DEFAULT_DS); 
 		ResponseInfo info = new ResponseInfo();
 		List<OperationPO> result = operationMapper.queryList(param);
 		info.data = result;
 		return info;
 	}
 	
-	public ResponseInfo queryList(OperationParam param) {
+	// 超级接口-数据过滤查询,不能加事务，加锁，否则数据源切换不过去
+	@Override
+	public ResponseInfo search(OperationParam param) {
+		// 切换数据源进行执行-默认数据源
+		DataSourceContextHolder.setDBType(SystemConstant.DEFAULT_DS);
+		// 校验重要信息operName字段
+		if (param ==  null || StringUtils.isBlank(param.getOperName())) {
+			throw new ServiceException(ErrorCodeEnum.CALL_VALIDATE_ERROR);
+		}
 		ResponseInfo info = new ResponseInfo();
 		List<OperationPO> result = operationMapper.queryList(param);
 		if (result != null && result.size() > 0) {
-			OperationPO po = result.get(0);
 			// 判断查询出来的第一条记录数据，如果有多条的话
+			OperationPO po = result.get(0);
 			if (po != null && StringUtils.isNotBlank(po.getText())) {
-				Map<String, Object> paramMap = param == null ? null: param.getQuery();
+				Map<String, Object> paramMap = param.getQuery();
 				// 传入的查询参数不返回
 				Map<String, Object> temp = new HashMap<String, Object>();
 				if (paramMap != null) {
@@ -66,15 +85,15 @@ public class OperationServiceImpl implements OperationService {
 					}
 				}
 				// 切换数据源进行执行
-				DataSourceContextHolder.setDBType(po.getDatasourceName()); 
+				if (!SystemConstant.DEFAULT_DS.equals(po.getDatasourceName())) {
+					DataSourceContextHolder.setDBType(po.getDatasourceName()); 
+				}
 				// 1.SQL
 				if (SystemConstant.OPER_TYPE_A.equals(po.getOperType())) {
 					info.data = operationMapper.executeSql(po.getText(), paramMap);
 				} else if (SystemConstant.OPER_TYPE_B.equals(po.getOperType())) {// 2.储存过程
 					// 看看存储过程调用是否有返回结果,存储过程的返回值不用新的map接受，值回传在参数里面的map里面
-					List<LinkedHashMap<String, Object>> list = operationMapper.callProcedure(po.getText(), paramMap);
-					Map<String, Object> resultData = new HashMap<String, Object>();
-					resultData.put("data", list);
+					info.data = operationMapper.callProcedure(po.getText(), paramMap);
 					if (SystemConstant.IS_YES.equals(po.getIsReturn())) {
 						for (Entry<String, Object> entry: temp.entrySet()) {
 							String key = entry.getKey();
@@ -82,10 +101,9 @@ public class OperationServiceImpl implements OperationService {
 							// 按key-value的方式去删除，可以避免存储过程INOUT的问题
 							paramMap.remove(key, value);
 						}
-						resultData.put("prout", paramMap);
 					} 
-					info.data = resultData;
-				} else {// 3.其他带扩展
+					info.out = paramMap;
+				} else {// 3.其他带扩展...
 					
 				}
 			}
@@ -99,6 +117,8 @@ public class OperationServiceImpl implements OperationService {
 	@Override
 	@Transactional
 	public ResponseInfo insertSelective(OperationVO vo) {
+		// 切换数据源进行执行-默认数据源
+		DataSourceContextHolder.setDBType(SystemConstant.DEFAULT_DS); 
 		validate(vo, SystemConstant.MODEL_ADD);
 		ResponseInfo info = new ResponseInfo();
 		OperationPO record = vo.toPO();
@@ -123,6 +143,8 @@ public class OperationServiceImpl implements OperationService {
 
 	// 新增和修改校验
 	private void validate(OperationVO vo,String model) {
+		// 切换数据源进行执行-默认数据源
+		DataSourceContextHolder.setDBType(SystemConstant.DEFAULT_DS); 
 		if (vo == null) {
 			throw new ServiceException("数据服务接口配置不能为空");
 		}
@@ -201,6 +223,8 @@ public class OperationServiceImpl implements OperationService {
 	@Override
 	@Transactional
 	public ResponseInfo updateSelective(OperationVO vo) {
+		// 切换数据源进行执行-默认数据源
+		DataSourceContextHolder.setDBType(SystemConstant.DEFAULT_DS); 
 		// 校验
 		validate(vo, SystemConstant.MODEL_UPDATE);
 		ResponseInfo info = new ResponseInfo();
@@ -234,6 +258,8 @@ public class OperationServiceImpl implements OperationService {
 	@Override
 	@Transactional
 	public ResponseInfo deleteByPrimaryKey(Integer id) {
+		// 切换数据源进行执行-默认数据源
+		DataSourceContextHolder.setDBType(SystemConstant.DEFAULT_DS); 
 		if (id == null) {
 			throw new ServiceException("删除ID不能为空");
 		}
@@ -259,6 +285,8 @@ public class OperationServiceImpl implements OperationService {
 	 */
 	@Override
 	public ResponseInfo selectByPrimaryKey(Integer id) {
+		// 切换数据源进行执行-默认数据源
+		DataSourceContextHolder.setDBType(SystemConstant.DEFAULT_DS); 
 		if (id == null) {
 			throw new ServiceException("查看ID不能为空");
 		}

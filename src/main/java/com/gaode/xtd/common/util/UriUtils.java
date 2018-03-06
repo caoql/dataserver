@@ -5,6 +5,8 @@ import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -49,5 +51,28 @@ public final class UriUtils {
 			}
 		}
 		return map;
+	}
+	
+	/**
+	 * 把请求参数封装成map,不管是GET还是POST
+	 * @param request
+	 * @return
+	 */
+	public static final Map<String, Object> analyzeQuery(HttpServletRequest request) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, String[]> params = request.getParameterMap();
+		if (params != null) {
+			for (String key : params.keySet()) {
+	            String[] values = params.get(key);
+	            for (int i = 0; i < values.length; i++) {
+	                String value = values[i];
+	                // 后面的会覆盖掉前面的,去除operName字段
+	                if (!"operName".equals(key)) {
+	                	result.put(key, value);
+	                }
+	            }
+	        }
+		}
+		return result;
 	}
 }

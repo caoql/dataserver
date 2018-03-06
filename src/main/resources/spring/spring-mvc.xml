@@ -11,10 +11,15 @@
 	<!-- 扫描指定的包controller -->
 	<context:component-scan base-package="com.gaode.xtd.*.controller" />
 
-	<mvc:annotation-driven/>
+	<mvc:annotation-driven validator="validator"/>
 
 	<mvc:default-servlet-handler />
 
+	<!-- 校验器，配置validator -->
+	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+        <property name="providerClass" value="org.hibernate.validator.HibernateValidator"></property>
+    </bean>
+    
 	<!-- 配置视图解析器 -->
 	<bean
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">

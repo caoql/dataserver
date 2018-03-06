@@ -8,6 +8,7 @@ package com.gaode.xtd.common.enums;
 public enum ErrorCodeEnum {
 	CALL_SUCCESS(0, "操作成功"), 
     CALL_ERROR(9999, "系统异常，请稍后重试..."),
+    CALL_VALIDATE_ERROR(1111, "参数校验失败"),
     
     //通用异常定义
     COMMON_ERROR(9000, "通用的未知错误"),

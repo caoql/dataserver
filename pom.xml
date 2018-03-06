@@ -68,6 +68,18 @@
 		</dependency>
 		<!-- commons lang end -->
 
+		<!-- Hibernate Validator -->
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>6.0.5.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>2.0.0.Final</version>
+		</dependency>
+		
 		<!-- ASPECTJ框架包 -->
 		<dependency>
 			<groupId>org.aspectj</groupId>
@@ -202,12 +214,26 @@
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
+					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
+			<!-- 解决maven test命令时console出现中文乱码乱码 -->  
+            <plugin>  
+                <groupId>org.apache.maven.plugins</groupId>  
+                <artifactId>maven-surefire-plugin</artifactId>  
+                <version>2.20.1</version>  
+                <configuration>  
+                    <forkMode>once</forkMode>  
+                    <argLine>-Dfile.encoding=UTF-8</argLine>   
+                </configuration>  
+            </plugin>  
 			<!--打包Mybatis的mapper.xml文件 -->
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>2.5</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+				</configuration>
 				<executions>
 					<execution>
 						<id>copy-xmls</id>

@@ -84,6 +84,7 @@
 		where id = #{id}
 	</select>
 
+	<!-- operation表的数据列表 -->
 	<select id="queryList" resultMap="BaseResultMap">
 		select
 		<include refid="Base_Column_List" />

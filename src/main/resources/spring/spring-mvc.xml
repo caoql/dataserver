@@ -20,14 +20,4 @@
         <property name="providerClass" value="org.hibernate.validator.HibernateValidator"></property>
     </bean>
     
-	<!-- 配置视图解析器 -->
-	<bean
-		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-		<!-- JstlView表示JSP模板页面需要使用JSTL标签库，classpath中必须包含jstl的相关jar包； -->
-		<property name="viewClass"
-			value="org.springframework.web.servlet.view.JstlView" />
-		<!-- 使用前缀和后缀 -->
-		<property name="prefix" value="/WEB-INF/jsp/" />
-		<property name="suffix" value=".jsp" />
-	</bean>
 </beans>

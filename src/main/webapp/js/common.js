@@ -49,6 +49,16 @@ var obj = {
 	        }
 	    });
 	    return obj;
-	}
+	},
+	/**
+	 * 向select选项中 加入一个Item 
+	 * @param objSelect 如: document.getElementById("operType")
+	 * @param objItemText 如:"SQL语句"
+	 * @param objItemValue 如: "A"
+	 */
+	addItemToSelect : function (objSelect, objItemText, objItemValue) { 
+		var varItem = new Option(objItemText, objItemValue); 
+		objSelect.options.add(varItem); 
+	} 
 }
 var $$ = obj;

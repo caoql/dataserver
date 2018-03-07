@@ -30,8 +30,6 @@
 				<div class="form-group">
 					<label for="datasourceId">数据源</label> <select class="form-control"
 						name="datasourceId" id="datasourceId">
-						<option value="4">defaultDataSource</option>
-						<option value="2">datasource1</option>
 					</select>
 				</div>
 				<div class="form-group">
@@ -123,6 +121,22 @@
 
 	// 页面加载完执行
 	$(function(){
+		// 向后台发送请求获取数据源的信息
+		$.ajax({
+			type: 'GET',
+			url: $$.appId + '/admin/operation/search?operName=datasource',
+			success: function(data) {
+				if (data && data.code == 0) {
+					if (data.data) {
+						var objSelect = document.getElementById("datasourceId");
+						for (var i in data.data) {
+							$$.addItemToSelect(objSelect, data.data[i].name, data.data[i].id);
+						}
+					}
+				} 
+			}
+		});
+		
 		//解析字符参数,程序会自动的提取":"开始以空格或者逗号结尾的单词
 		/*example:select * from user where usernmae=:name and id=:id
 		 程序会自动的提取:name及:id两个参数

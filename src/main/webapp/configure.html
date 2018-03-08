@@ -18,7 +18,7 @@
 			<form id="formTemple">
 				<div class="form-group">
 					<label for="operName">操作名称</label> <input type="text"
-						class="form-control" id="operName" name="operName" placeholder="操作名称(不超过20个字符，不要包含特殊字符，如？，&，#等，最好都是英文字母)" maxlength="20" required:true>
+						class="form-control" id="operName" name="operName" placeholder="操作名称(不超过40个字符，必须以字母开头，可由字母数字组成)" maxlength="40" required:true>
 				</div>
 				<div class="form-group">
 					<label for="operType">语句类型</label> <select class="form-control"
@@ -34,7 +34,7 @@
 				</div>
 				<div class="form-group">
 					<label for="sqltemplate">模板</label>
-					<textarea class="form-control" rows="3" id="sqltemplate" name="sqltemplate" placeholder="sql模板或者调用存储过程(要和上面的语句类型对应，最多不超过1000个字符)" maxlength="1000"></textarea>
+					<textarea class="form-control" rows="3" id="sqltemplate" name="sqltemplate" placeholder="sql模板或者调用存储过程(要和上面的语句类型对应，最多不超过2000个字符)" maxlength="2000"></textarea>
 				</div>
 				<button class="btn btn-info" type="button" id="btnSave">保存</button>
 				<button class="btn btn-primary" type="button" id="btnExplain">解析参数</button>

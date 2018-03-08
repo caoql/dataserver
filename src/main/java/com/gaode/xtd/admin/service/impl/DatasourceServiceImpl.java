@@ -17,7 +17,6 @@ import com.gaode.xtd.admin.mapper.DatasourceconfigMapper;
 import com.gaode.xtd.admin.service.DatasourceService;
 import com.gaode.xtd.common.SystemConstant;
 import com.gaode.xtd.common.config.DataSourceContextHolder;
-import com.gaode.xtd.common.config.DynamicDataSource;
 import com.gaode.xtd.common.enums.ErrorCodeEnum;
 import com.gaode.xtd.common.exception.ServiceException;
 import com.gaode.xtd.common.info.ResponseInfo;
@@ -33,10 +32,6 @@ public class DatasourceServiceImpl implements DatasourceService {
 	// 注入数据源Mapper
 	@Autowired
 	private DatasourceconfigMapper datasourceconfigMapper;
-	
-	// 注入动态数据源来实时更新数据源
-	@Autowired
-	private DynamicDataSource dds;
 		
 	// 新增
 	@Override
@@ -54,8 +49,6 @@ public class DatasourceServiceImpl implements DatasourceService {
 		if (result != 1) {
 			throw new ServiceException(ErrorCodeEnum.DB_INSERT_ERROR);
 		}
-		// 系统的动态数据源更新
-		dds.setTargetDataSources(null);
 		return info;
 	}
 
@@ -73,8 +66,6 @@ public class DatasourceServiceImpl implements DatasourceService {
 		if (result != 1) {
 			throw new ServiceException(ErrorCodeEnum.DB_UPDATE_ERROR);
 		}
-		// 系统的动态数据源更新
-		dds.setTargetDataSources(null);
 		return info;
 	}
 

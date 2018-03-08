@@ -15,6 +15,7 @@
 						<div class="panel panel-success">
 							<div class="panel-heading">数据服务列表</div>
 							<button class="btn btn-info" type="button"  v-on:click="add()">新增</button>
+							<button class="btn btn-info" type="button"  v-on:click="showDatasourceList()">数据源列表》》</button>
 							<panel class="pane-body">
 								<table class="table">
 									<tr>
@@ -64,6 +65,9 @@
 			plist: []
 		},
 		methods: {
+			showDatasourceList: function() {
+				window.location.href =  $$.appId + '/datasourceList.html';
+			},
 			add: function() {
 				window.location.href =  $$.appId + '/configure.html';
 			},

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import com.gaode.xtd.admin.domain.po.OperationPO;
@@ -26,6 +27,7 @@ public class OperationVO implements Serializable {
 	// 文本名字
 	@NotNull(message="操作名称不能为空")
 	@Size(max=40,message="操作名称最多40个字符")
+	@Pattern(regexp="^[a-zA-Z][a-zA-Z0-9]*$",message="<操作名称>必须以字母开头，可由字母数字组成")
 	private String operName;
 	
 	// 存储文本类型,A:sql,B:存储过程

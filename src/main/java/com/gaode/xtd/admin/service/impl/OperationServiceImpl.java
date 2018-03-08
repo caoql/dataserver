@@ -75,15 +75,6 @@ public class OperationServiceImpl implements OperationService {
 			OperationPO po = result.get(0);
 			if (po != null && StringUtils.isNotBlank(po.getText())) {
 				Map<String, Object> paramMap = param.getQuery();
-				// 传入的查询参数不返回
-				Map<String, Object> temp = new HashMap<String, Object>();
-				if (paramMap != null) {
-					for (Entry<String, Object> entry: paramMap.entrySet()) {
-						String key = entry.getKey();
-						Object value = entry.getValue();
-						temp.put(key, value);
-					}
-				}
 				// 切换数据源进行执行
 				if (!SystemConstant.DEFAULT_DS.equals(po.getDatasourceName())) {
 					DataSourceContextHolder.setDBType(po.getDatasourceName()); 
@@ -92,6 +83,16 @@ public class OperationServiceImpl implements OperationService {
 				if (SystemConstant.OPER_TYPE_A.equals(po.getOperType())) {
 					info.data = operationMapper.executeSql(po.getText(), paramMap);
 				} else if (SystemConstant.OPER_TYPE_B.equals(po.getOperType())) {// 2.储存过程
+					// 传入的查询参数不返回
+					Map<String, Object> temp = new HashMap<String, Object>();
+					// 只有函数调用且有返回值才需要存储
+					if (paramMap != null) {
+						for (Entry<String, Object> entry: paramMap.entrySet()) {
+							String key = entry.getKey();
+							Object value = entry.getValue();
+							temp.put(key, value);
+						}
+					}
 					// 看看存储过程调用是否有返回结果,存储过程的返回值不用新的map接受，值回传在参数里面的map里面
 					info.data = operationMapper.callProcedure(po.getText(), paramMap);
 					if (SystemConstant.IS_YES.equals(po.getIsReturn())) {

@@ -14,6 +14,7 @@
 					<div class="col-sm-6">
 						<div class="panel panel-success">
 							<div class="panel-heading">数据源列表</div>
+							<button class="btn btn-info" type="button"  v-on:click="returnDataserver()">《《返回数据服务列表</button>
 							<button class="btn btn-info" type="button"  v-on:click="add()">新增</button>
 							<panel class="pane-body">
 								<table class="table">
@@ -69,6 +70,9 @@
 			plist: []
 		},
 		methods: {
+			returnDataserver: function(){
+				window.location.href = $$.appId + '/list.html';
+			},
 			add: function() {
 				window.location.href = $$.appId + '/datasourceAdd.html';
 			},

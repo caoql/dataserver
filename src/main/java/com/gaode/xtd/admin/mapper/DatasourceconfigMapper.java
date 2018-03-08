@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.gaode.xtd.admin.domain.po.DatasourceconfigPO;
+import com.gaode.xtd.admin.domain.query.DatasourceconfigParam;
 
 public interface DatasourceconfigMapper {
     int deleteByPrimaryKey(Integer id);
@@ -15,4 +16,6 @@ public interface DatasourceconfigMapper {
     int updateByPrimaryKeySelective(DatasourceconfigPO record);
 
     List<DatasourceconfigPO> listAll(Map<String, Object> paramMap);
+
+	List<DatasourceconfigPO> list(DatasourceconfigParam param);
 }

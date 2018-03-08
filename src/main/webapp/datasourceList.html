@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<title>数据源列表</title>
+</head>
+<body>
+	<div class="panel panel-success">
+			<div id="app">
+				<div class="row">
+					<div class="col-sm-6">
+						<div class="panel panel-success">
+							<div class="panel-heading">数据源列表</div>
+							<button class="btn btn-info" type="button"  v-on:click="add()">新增</button>
+							<panel class="pane-body">
+								<table class="table">
+									<tr>
+										<th>数据源名称</th>
+										<th>驱动</th>
+										<th>URL</th>
+										<th>用户名</th>
+										<th>密码</th>
+										<th>是否启用</th>
+										<th>操作</th>
+									</tr>
+									<tr v-for="item in plist">
+										<td>{{item.name}}</td>
+										<td>{{item.jdbcDriver}}</td>
+										<td>{{item.jdbcUrl}}</td>
+										<td>{{item.jdbcUsername}}</td>
+										<td>{{item.jdbcPassword}}</td>
+										<td>{{item.isUse == 1 ? '启用' : (item.isUse == 0 ? '禁用' : item.isUse)}}</td>
+										<td><a href="javascript:void(0)" v-on:click="edit(item)">编辑</a></td>
+									</tr>
+								</table>
+							</panel>
+						</div>
+					</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script src="js/jquery-3.2.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/vue.min.js"></script>
+<script src="js/common.js"></script>
+<script type="text/javascript">
+	$(function(){
+		// 向后台发送post请求获取界面数据
+		$.ajax({
+			type: 'POST',
+			url: $$.appId + '/admin/datasource/list',
+			data: null,
+			success: function(data) {
+				console.log(data);
+				if (data && data.code == 0) {
+					app.plist = data.data;
+				} 
+			}
+		});
+	});
+	
+	var app = new Vue({
+		el: '#app',
+		data: {
+			plist: []
+		},
+		methods: {
+			add: function() {
+				window.location.href = $$.appId + '/datasourceAdd.html';
+			},
+			edit: function(item) {
+				window.location.href = $$.appId + '/datasourceEdit.html?id=' + item.id;
+			}
+		}
+	});
+</script>
+</html>

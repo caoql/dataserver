@@ -66,7 +66,7 @@ public class OperationController {
 	
 	// 数据列表展示
 	@PostMapping("/list")
-	public ResponseInfo list(OperationParam param) throws Exception {
+	public ResponseInfo list(OperationParam param) {
 		return operationService.list(param);
 	}
 	

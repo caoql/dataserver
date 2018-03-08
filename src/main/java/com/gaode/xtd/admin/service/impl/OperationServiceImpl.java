@@ -141,82 +141,6 @@ public class OperationServiceImpl implements OperationService {
 		return info;
 	}
 
-	// 新增和修改校验
-	private void validate(OperationVO vo,String model) {
-		// 切换数据源进行执行-默认数据源
-		DataSourceContextHolder.setDBType(SystemConstant.DEFAULT_DS); 
-		if (vo == null) {
-			throw new ServiceException("数据服务接口配置不能为空");
-		}
-		if (SystemConstant.MODEL_UPDATE.equals(model) && vo.getId() == null) {
-			throw new ServiceException("ID不能为空");
-		}
-		if (StringUtils.isBlank(vo.getOperName())) {
-			throw new ServiceException("<操作名称>不能为空");
-		}
-		// 检查operName是否重复
-		OperationParam param = new OperationParam();
-		param.setOperName(vo.getOperName());
-		List<OperationPO> list = operationMapper.queryList(param);
-		if (list != null && list.size() > 0) {
-			if (SystemConstant.MODEL_ADD.equals(model)) {
-				throw new ServiceException("<操作名称>(oper_name):" + vo.getOperName() + "已经存在，不能重复");
-			} else if (SystemConstant.MODEL_UPDATE.equals(model)) {
-				for (OperationPO po : list) {
-					// 查询出所有这个operName名字的，只要他们的ID有一个和编辑数据的ID不同，就认为已经存在这个operName
-					if (!Objects.equals(po.getId(), vo.getId())) {
-						throw new ServiceException("<操作名称>(oper_name):" + vo.getOperName() + "已经存在，不能重复");
-					}
-				}
-			}
-		}
-		String operType = vo.getOperType();
-		if (StringUtils.isBlank(operType)) {
-			throw new ServiceException("<语句类型>不能为空");
-		}
-		if (StringUtils.isBlank(vo.getSqltemplate())) {
-			throw new ServiceException("<模板>不能为空");
-		}
-		if (vo.getDatasourceId() == null || StringUtils.isBlank(vo.getDatasourceName())) {
-			throw new ServiceException("<数据源>不能为空");
-		}
-		String sqltemplate = vo.getSqltemplate();
-		// 默认没有返回值
-		String isReturn = SystemConstant.IS_NOT;
-		List<QueryparameterVO> plist = vo.getQueryParamList();
-		if (plist != null) {
-			for (QueryparameterVO parameterVO: plist) {
-				// 参数名称
-				String pname = parameterVO.getPname();
-				if (StringUtils.isBlank(pname)) {
-					throw new ServiceException("<参数名称>不能为空");
-				}
-				// SQL语句
-				if (SystemConstant.OPER_TYPE_A.equals(operType)) {
-					pname = "#{param." + pname.substring(1) + "}";
-				} else if (SystemConstant.OPER_TYPE_B.equals(operType)) {// 储存过程
-					// 参数类型
-					String ptype =parameterVO.getPtype();
-					// 输入/输出
-					String pdirection = parameterVO.getPdirection();
-					if (StringUtils.isBlank(ptype)) {
-						throw new ServiceException(pname + "的<参数类型>不能为空");
-					}
-					if (StringUtils.isBlank(pdirection)) {
-						throw new ServiceException(pname + "的<输入/输出>不能为空");
-					}
-					if (SystemConstant.P_DIRECTION_OUT.equals(pdirection)) {// 存储过程是否有返回值
-						isReturn = SystemConstant.IS_YES;
-					}
-					pname = "#{param." + pname.substring(1) + ",jdbcType=" + ptype + ",mode=" + pdirection + "}";
-				}
-				sqltemplate = sqltemplate.replace(parameterVO.getPname(), pname);
-			}
-		}
-		vo.setIsReturn(isReturn);
-		vo.setText(sqltemplate);
-	}
-	
 	/**
 	 * 修改
 	 */
@@ -295,4 +219,77 @@ public class OperationServiceImpl implements OperationService {
 		return info;
 	}
 
+	// 新增和修改校验
+	private void validate(OperationVO vo,String model) {
+		if (vo == null) {
+			throw new ServiceException("数据服务接口配置不能为空");
+		}
+		if (SystemConstant.MODEL_UPDATE.equals(model) && vo.getId() == null) {
+			throw new ServiceException("修改<ID>不能为空");
+		}
+		if (StringUtils.isBlank(vo.getOperName())) {
+			throw new ServiceException("<操作名称>不能为空");
+		}
+		// 检查operName是否重复
+		OperationParam param = new OperationParam();
+		param.setOperName(vo.getOperName());
+		List<OperationPO> list = operationMapper.queryList(param);
+		if (list != null && list.size() > 0) {
+			if (SystemConstant.MODEL_ADD.equals(model)) {
+				throw new ServiceException("<操作名称>(oper_name):" + vo.getOperName() + "已经存在，不能重复");
+			} else if (SystemConstant.MODEL_UPDATE.equals(model)) {
+				for (OperationPO po : list) {
+					// 查询出所有这个operName名字的，只要他们的ID有一个和编辑数据的ID不同，就认为已经存在这个operName
+					if (!Objects.equals(po.getId(), vo.getId())) {
+						throw new ServiceException("<操作名称>(oper_name):" + vo.getOperName() + "已经存在，不能重复");
+					}
+				}
+			}
+		}
+		String operType = vo.getOperType();
+		if (StringUtils.isBlank(operType)) {
+			throw new ServiceException("<语句类型>不能为空");
+		}
+		if (StringUtils.isBlank(vo.getSqltemplate())) {
+			throw new ServiceException("<模板>不能为空");
+		}
+		if (vo.getDatasourceId() == null || StringUtils.isBlank(vo.getDatasourceName())) {
+			throw new ServiceException("<数据源>不能为空");
+		}
+		String sqltemplate = vo.getSqltemplate();
+		// 默认没有返回值
+		String isReturn = SystemConstant.IS_NOT;
+		List<QueryparameterVO> plist = vo.getQueryParamList();
+		if (plist != null) {
+			for (QueryparameterVO parameterVO: plist) {
+				// 参数名称
+				String pname = parameterVO.getPname();
+				if (StringUtils.isBlank(pname)) {
+					throw new ServiceException("<参数名称>不能为空");
+				}
+				// SQL语句
+				if (SystemConstant.OPER_TYPE_A.equals(operType)) {
+					pname = "#{param." + pname.substring(1) + "}";
+				} else if (SystemConstant.OPER_TYPE_B.equals(operType)) {// 储存过程
+					// 参数类型
+					String ptype =parameterVO.getPtype();
+					// 输入/输出
+					String pdirection = parameterVO.getPdirection();
+					if (StringUtils.isBlank(ptype)) {
+						throw new ServiceException(pname + "的<参数类型>不能为空");
+					}
+					if (StringUtils.isBlank(pdirection)) {
+						throw new ServiceException(pname + "的<输入/输出>不能为空");
+					}
+					if (SystemConstant.P_DIRECTION_OUT.equals(pdirection)) {// 存储过程是否有返回值
+						isReturn = SystemConstant.IS_YES;
+					}
+					pname = "#{param." + pname.substring(1) + ",jdbcType=" + ptype + ",mode=" + pdirection + "}";
+				}
+				sqltemplate = sqltemplate.replace(parameterVO.getPname(), pname);
+			}
+		}
+		vo.setIsReturn(isReturn);
+		vo.setText(sqltemplate);
+	}
 }

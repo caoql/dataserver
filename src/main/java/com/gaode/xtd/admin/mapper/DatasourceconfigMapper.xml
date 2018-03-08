@@ -26,12 +26,44 @@
 		where id = #{id}
 	</select>
 	
+	<!-- 通过map查询列表 -->
 	<select id="listAll" resultMap="BaseResultMap" parameterType="map">
 		select
 		<include refid="Base_Column_List" />
 		from datasourceconfig
+		<include refid="queryWhere" />
 	</select>
 	
+	<!-- 通过pojo查询列表 -->
+	<select id="list" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from datasourceconfig
+		<include refid="queryWhere" />
+	</select>
+	
+	<sql id="queryWhere">
+		<where>
+			<if test="name != null and name !=''">
+				AND name = #{name}
+			</if>
+			<if test="jdbcDriver != null and jdbcDriver !=''">
+				AND jdbc_driver = #{jdbcDriver}
+			</if>
+			<if test="jdbcUrl != null and jdbcUrl !=''">
+				AND jdbc_url = #{jdbcUrl}
+			</if>
+			<if test="jdbcUsername != null and jdbcUsername !=''">
+				AND jdbc_username = #{jdbcUsername}
+			</if>
+			<if test="jdbcPassword != null and jdbcPassword !=''">
+				AND jdbc_password = #{jdbcPassword}
+			</if>
+			<if test="isUse != null">
+				AND is_use = #{isUse}
+			</if>
+		</where>
+	</sql>
 
 	<delete id="deleteByPrimaryKey">
 		delete from datasourceconfig
